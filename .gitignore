@@ -1,0 +1,84 @@
+# Sistema Predictivo de Diabetes - Gitignore
+
+# Entornos virtuales
+venv/
+env/
+.venv/
+.env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Modelos y datos generados
+models/*.joblib
+models/*.pkl
+models/model_metadata.json
+outputs/*.csv
+outputs/*.json
+data/*.csv
+
+# Notebooks de Jupyter (si se generan)
+*.ipynb_checkpoints/
+.ipynb_checkpoints/
+
+# Logs
+*.log
+logs/
+
+# Configuración del sistema operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos temporales
+*.tmp
+*.temp
+.cache/
+
+# Configuración local
+config_local.py
+.env.local
+
+# Resultados de pruebas
+test_results/
+coverage.xml
+.coverage
+htmlcov/
+
+# Archivos de instalación
+*.whl
+*.tar.gz
+
+# Archivos de Google Colab (si se suben accidentalmente)
+*.ipynb
