@@ -369,6 +369,48 @@ Para soporte técnico o preguntas:
 - Revisar la documentación
 - Verificar los ejemplos de uso
 
+## 🔧 Solución de Problemas
+
+### ✅ Problema: "Modelo no cargado" en interfaz web
+**Solución implementada:** Se corrigió el sistema de carga de modelos en `predictor.py`
+
+**Problema identificado:**
+- El método `_load_model_from_mlflow()` intentaba cargar modelos desde MLflow primero
+- Al fallar, el fallback a archivos locales usaba nombres incorrectos
+- `model_name.replace('_', ' ')` convertía "random_forest" a "random forest.joblib"
+- Los archivos reales son "random_forest.joblib" y "gradient_boosting.joblib"
+
+**Solución aplicada:**
+```python
+# ❌ Antes (incorrecto)
+model_filename = f"{self.model_name.replace('_', ' ')}.joblib"
+
+# ✅ Después (corregido)
+model_filename = f"{self.model_name}.joblib"
+```
+
+**Sistema de fallback mejorado:**
+1. **Primero:** Intenta cargar desde MLflow
+2. **Fallback:** Si falla, carga desde archivos locales
+3. **Logging:** Registra el proceso completo para debugging
+4. **Error handling:** Manejo robusto de excepciones
+
+**Verificación:**
+- ✅ Ambos modelos (Random Forest y Gradient Boosting) cargan correctamente
+- ✅ Predicciones funcionan en API y interfaz web
+- ✅ Sistema de fallback opera sin problemas
+
+**Para verificar la solución:**
+```bash
+python -c "
+from predictor import DiabetesPredictor
+predictor = DiabetesPredictor('random_forest')
+print('Modelo cargado:', predictor.model is not None)
+result = predictor.predict({'edad': 45, 'sexo': 'M', 'imc': 25.5})
+print('Predicción:', result)
+"
+```
+
 ## 🚀 Mejoras Implementadas
 
 ### ✅ API REST (FastAPI)

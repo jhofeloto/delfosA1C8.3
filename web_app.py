@@ -14,6 +14,7 @@ from pathlib import Path
 # Importar módulos del proyecto
 from predictor import predict_glucose, DiabetesPredictor
 from config import config
+import mlflow.pyfunc
 
 # Configuración de la página
 st.set_page_config(
@@ -63,18 +64,38 @@ def main():
     with st.sidebar:
         st.header("ℹ️ Información del Sistema")
 
+        # Selector de modelo
+        st.subheader("🤖 Selección de Modelo")
+        model_options = {
+            "Gradient Boosting": "gradient_boosting",
+            "Random Forest": "random_forest"
+        }
+
+        selected_model_display = st.selectbox(
+            "Selecciona el modelo para predicciones:",
+            options=list(model_options.keys()),
+            index=0,
+            help="Elige el modelo de machine learning a utilizar"
+        )
+
+        selected_model_name = model_options[selected_model_display]
+
         # Cargar información del modelo
         try:
-            predictor = DiabetesPredictor()
+            predictor = DiabetesPredictor(model_name=selected_model_name)
             model_info = predictor.get_model_info()
 
             if "error" not in model_info:
-                st.success("✅ Modelo cargado correctamente")
+                st.success(f"✅ Modelo {selected_model_display} cargado correctamente")
 
-                st.metric("Modelo", model_info["model_name"])
+                st.metric("Modelo", selected_model_display)
                 st.metric("R² Score", f"{model_info['r2_score']:.4f}")
                 st.metric("Características", model_info["n_features"])
                 st.metric("Entrenamiento", model_info["training_date"][:10])
+
+                # Guardar el predictor en session state para usar en predicciones
+                st.session_state.predictor = predictor
+                st.session_state.selected_model = selected_model_name
             else:
                 st.error("❌ Error cargando el modelo")
                 st.error(model_info["error"])
@@ -189,7 +210,12 @@ def individual_prediction_tab():
         # Realizar predicción
         with st.spinner("Analizando datos del paciente..."):
             try:
-                result = predict_glucose(patient_data)
+                # Usar el predictor seleccionado si está disponible
+                if 'predictor' in st.session_state:
+                    result = st.session_state.predictor.predict(patient_data)
+                else:
+                    # Fallback a la función global
+                    result = predict_glucose(patient_data, model_name=selected_model_name)
 
                 if "error" not in result:
                     display_prediction_result(result)
@@ -335,19 +361,27 @@ def batch_analysis_tab():
 
 def process_batch_predictions(df):
     """Procesar predicciones para múltiples pacientes"""
-    from predictor import predict_glucose
-
     results = []
 
     progress_bar = st.progress(0)
     status_text = st.empty()
+
+    # Usar el predictor seleccionado si está disponible
+    if 'predictor' in st.session_state:
+        predictor = st.session_state.predictor
+    else:
+        from predictor import predict_glucose
+        predictor = None
 
     for i, (_, patient) in enumerate(df.iterrows()):
         # Convertir fila a diccionario
         patient_dict = patient.to_dict()
 
         # Hacer predicción
-        result = predict_glucose(patient_dict)
+        if predictor:
+            result = predictor.predict(patient_dict)
+        else:
+            result = predict_glucose(patient_dict, model_name=st.session_state.get('selected_model', 'gradient_boosting'))
 
         # Agregar información del paciente
         result["paciente_id"] = i + 1
@@ -526,20 +560,25 @@ def information_tab():
     Este sistema utiliza **machine learning avanzado** para predecir niveles de glucosa
     en sangre y clasificar el riesgo de diabetes en pacientes.
 
-    ### 🔬 Modelos Implementados
+    ### 🔬 Modelos Disponibles
 
-    El sistema incluye **13 modelos de machine learning** diferentes:
+    El sistema incluye **múltiples modelos de machine learning** entrenados y disponibles:
     """)
 
     models_info = {
-        "Lineales": ["Linear Regression", "Ridge Regression", "Lasso Regression", "Elastic Net"],
-        "Ensemble": ["Random Forest", "Extra Trees"],
-        "Boosting": ["Gradient Boosting", "XGBoost", "LightGBM", "AdaBoost"],
-        "Otros": ["SVM", "K-Nearest Neighbors", "Neural Network"]
+        "🌲 **Random Forest**": "Modelo de ensemble basado en árboles de decisión",
+        "🚀 **Gradient Boosting**": "Modelo de boosting con alto rendimiento predictivo"
     }
 
-    for category, models in models_info.items():
-        st.markdown(f"**{category}:** {', '.join(models)}")
+    for model_name, description in models_info.items():
+        st.markdown(f"- **{model_name}**: {description}")
+
+    st.markdown("""
+    ### 🔄 Selección de Modelos
+
+    Puedes seleccionar el modelo a utilizar desde el panel lateral. Cada modelo
+    tiene sus propias características y puede producir resultados ligeramente diferentes.
+    """)
 
     st.markdown("""
     ### 📊 Métricas de Rendimiento
