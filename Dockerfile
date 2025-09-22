@@ -23,6 +23,11 @@ COPY . .
 # Crear directorios necesarios
 RUN mkdir -p /app/models /app/outputs/mlruns /app/logs /app/data
 
+# Copiar modelos - Railway los tendrá disponibles en el build context
+COPY models/*.joblib /app/models/ 2>/dev/null || echo "Modelos se copiarán en tiempo de ejecución"
+COPY models/scaler.joblib /app/models/ 2>/dev/null || echo "Scaler se copiará en tiempo de ejecución"
+COPY models/model_metadata.json /app/models/ 2>/dev/null || echo "Metadata se copiará en tiempo de ejecución"
+
 # Copiar modelos pre-entrenados (si existen)
 # Nota: Los modelos se copiarán en tiempo de ejecución si no existen
 RUN mkdir -p /app/models /app/outputs/mlruns
@@ -38,21 +43,40 @@ echo "🚀 Iniciando Sistema Predictivo de Diabetes..."\n\
 mkdir -p /app/models /app/outputs/mlruns /app/logs /app/data\n\
 \n\
 # Copiar modelos si existen\n\
-if ls /tmp/models/*.joblib 1> /dev/null 2>&1; then\n\
-    echo "📦 Copiando modelos encontrados..."\n\
-    cp /tmp/models/*.joblib /app/models/\n\
-    echo "✅ Modelos copiados exitosamente"\n\
+echo "📦 Verificando modelos disponibles..."\n\
+if [ -f "/app/models/gradient_boosting.joblib" ]; then\n\
+    echo "✅ Modelos ya disponibles en /app/models/"\n\
 else\n\
-    echo "⚠️ No se encontraron modelos locales, se usarán modelos por defecto"\n\
+    echo "📥 Copiando modelos desde el build context..."\n\
+    # Copiar modelos desde el directorio de trabajo\n\
+    if [ -d "/tmp/models" ] && ls /tmp/models/*.joblib 1> /dev/null 2>&1; then\n\
+        cp /tmp/models/*.joblib /app/models/\n\
+        echo "✅ Modelos copiados desde /tmp/models/"\n\
+    else\n\
+        echo "⚠️ No se encontraron modelos en /tmp/models/, intentando copia directa..."\n\
+        # Intentar copiar directamente (esto debería funcionar si los modelos están en el build context)\n\
+        cp -r /app/models_orig/* /app/models/ 2>/dev/null || echo "⚠️ No se pudieron copiar modelos"\n\
+    fi\n\
+fi\n\
+\n\
+# Verificar que los modelos críticos existen\n\
+if [ -f "/app/models/gradient_boosting.joblib" ] || [ -f "/app/models/random_forest.joblib" ]; then\n\
+    echo "✅ Modelos principales encontrados"\n\
+else\n\
+    echo "❌ No se encontraron modelos principales - esto causará problemas"\n\
 fi\n\
 \n\
 # Copiar datos de MLflow si existen\n\
-if [ -d "/tmp/mlruns" ]; then\n\
-    echo "📊 Copiando datos de MLflow..."\n\
-    cp -r /tmp/mlruns /app/outputs/\n\
-    echo "✅ Datos de MLflow copiados"\n\
+if [ -d "/app/outputs/mlruns" ]; then\n\
+    echo "✅ Datos de MLflow ya disponibles"\n\
 else\n\
-    echo "⚠️ No se encontraron datos de MLflow"\n\
+    echo "📊 Copiando datos de MLflow..."\n\
+    if [ -d "/tmp/mlruns" ]; then\n\
+        cp -r /tmp/mlruns /app/outputs/\n\
+        echo "✅ Datos de MLflow copiados"\n\
+    else\n\
+        echo "⚠️ No se encontraron datos de MLflow"\n\
+    fi\n\
 fi\n\
 \n\
 # Configurar permisos\n\
