@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/jhofeloto/Library/CloudStorage/GoogleDrive-jhofeloto%4041gu5.com/Unidades%20compartidas/111598%20%7C%20Entregables%20Delfos%203/Nodriza/7%20-%20Informe%20de%20Resultados%20de%20los%20Modelos%20de%20ML%20y%20DL/7.2%20Informe%20Intermedio%20de%20Ajustes/A1%20Modelo/delfosA1C8.3/mlruns/199460918044628332/272498102162431c9e11ebbbca8e071b/artifacts
+end_time: 1758568931545
+entry_point_name: ''
+experiment_id: '199460918044628332'
+lifecycle_stage: active
+run_id: 272498102162431c9e11ebbbca8e071b
+run_name: Debug_RF_Test
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1758568928759
+status: 3
+tags: []
+user_id: jhofeloto

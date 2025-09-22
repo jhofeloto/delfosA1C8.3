@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/jhofeloto/Library/CloudStorage/GoogleDrive-jhofeloto%4041gu5.com/Unidades%20compartidas/111598%20%7C%20Entregables%20Delfos%203/Nodriza/7%20-%20Informe%20de%20Resultados%20de%20los%20Modelos%20de%20ML%20y%20DL/7.2%20Informe%20Intermedio%20de%20Ajustes/A1%20Modelo/delfosA1C8.3/mlruns/476295757094274763/cc9f55987abb43859c10cf4f31f5ed5e/artifacts
+end_time: 1758567946470
+entry_point_name: ''
+experiment_id: '476295757094274763'
+lifecycle_stage: active
+run_id: cc9f55987abb43859c10cf4f31f5ed5e
+run_name: RandomForest_Fallback
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1758567943320
+status: 3
+tags: []
+user_id: jhofeloto
