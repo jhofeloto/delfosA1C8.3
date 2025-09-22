@@ -23,19 +23,42 @@ Este proyecto implementa un pipeline completo de machine learning para la predic
 
 ## 📁 Estructura del Proyecto
 
+### Archivos Principales
 ```
 diabetes_prediction_system/
-├── config.py              # Configuración centralizada
-├── data_generator.py      # Generación de datos sintéticos
-├── data_preprocessor.py   # Preprocesamiento de datos
-├── model_trainer.py       # Entrenamiento de modelos
-├── predictor.py           # Sistema de predicción
-├── main.py               # Script principal
-├── requirements.txt      # Dependencias
-├── README.md            # Documentación
-├── models/              # Modelos entrenados (generado)
-├── outputs/             # Resultados y análisis (generado)
-└── data/               # Datos generados (generado)
+├── 📄 config.py                    # Configuración centralizada
+├── 📄 data_generator.py            # Generación de datos sintéticos
+├── 📄 data_preprocessor.py         # Preprocesamiento de datos
+├── 📄 model_trainer.py             # Entrenamiento de modelos
+├── 📄 predictor.py                 # Sistema de predicción
+├── 📄 main.py                     # Script principal ML
+├── 📄 api.py                      # API REST (FastAPI)
+├── 📄 web_app.py                  # Interfaz web (Streamlit)
+├── 📄 hyperparameter_optimizer.py  # Optimización (Optuna)
+├── 📄 model_monitoring.py          # Monitoreo (MLflow)
+├── 📄 database_manager.py          # Base de datos (SQLAlchemy)
+├── 📄 test_system.py              # Pruebas del sistema
+├── 📄 requirements.txt            # Dependencias
+├── 📄 README.md                   # Documentación
+└── 📄 .gitignore                  # Git ignore
+```
+
+### Directorios Generados
+```
+diabetes_prediction_system/
+├── 📁 models/                     # Modelos entrenados
+│   ├── best_model.joblib         # Mejor modelo
+│   ├── scaler.joblib             # Scaler para preprocesamiento
+│   └── model_metadata.json       # Metadatos del modelo
+├── 📁 outputs/                    # Resultados y análisis
+│   ├── mlruns/                   # MLflow tracking
+│   ├── model_comparison.csv      # Comparación de modelos
+│   ├── optimization_results.json # Resultados de optimización
+│   └── api_predictions.log       # Log de predicciones API
+├── 📁 data/                       # Datos generados
+│   ├── diabetes_dataset_*.csv    # Datasets sintéticos
+│   └── diabetes_medical.db       # Base de datos SQLite
+└── 📁 temp_artifacts/             # Artefactos temporales
 ```
 
 ## 🛠️ Instalación
@@ -59,49 +82,157 @@ pip install -r requirements.txt
 
 ## 🎯 Uso
 
-### Ejecución completa del pipeline
+### 1. Pipeline Original (Machine Learning)
 ```bash
+# Ejecución completa del pipeline
 python main.py
+
+# Con opciones personalizadas
+python main.py --samples 2000     # 2000 muestras
+python main.py --analyze          # Solo análisis
+python main.py --predict          # Solo predicción
+python main.py --no-save          # No guardar datos
 ```
 
-### Con opciones personalizadas
+### 2. API REST (FastAPI)
 ```bash
-# Pipeline con 2000 muestras
-python main.py --samples 2000
+# Iniciar servidor API
+python api.py --host 0.0.0.0 --port 8000
 
-# Solo análisis de datos
-python main.py --analyze
-
-# Solo ejemplo de predicción
-python main.py --predict
-
-# No guardar datos generados
-python main.py --no-save
+# Documentación disponible en:
+# http://localhost:8000/docs
+# http://localhost:8000/redoc
 ```
 
-### Uso programático
+### 3. Interfaz Web (Streamlit)
+```bash
+# Iniciar interfaz web
+python web_app.py
 
+# O con configuración personalizada
+streamlit run web_app.py --server.port 8501
+```
+
+### 4. Optimización de Hiperparámetros
+```bash
+# Optimizar modelos específicos
+python -c "
+from hyperparameter_optimizer import optimize_diabetes_models
+from data_generator import create_sample_dataset
+from data_preprocessor import preprocess_diabetes_data
+from sklearn.model_selection import train_test_split
+
+# Preparar datos
+df = create_sample_dataset(500)
+df_processed, preprocessor = preprocess_diabetes_data(df)
+X = df_processed.drop('Resultado', axis=1)
+y = df_processed['Resultado']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Escalar
+X_train_scaled, X_test_scaled = preprocessor.scale_features(X_train, X_test)
+
+# Optimizar
+results = optimize_diabetes_models(
+    X_train_scaled, y_train, X_test_scaled, y_test,
+    models_to_optimize=['Random Forest', 'XGBoost'],
+    n_trials=30
+)
+print(f'Mejor modelo: {results[\"optimization_results\"][\"best_model\"]}')
+"
+```
+
+### 5. Base de Datos Médica
+```bash
+# Usar gestor de base de datos
+python -c "
+from database_manager import create_database_manager
+
+# Crear gestor
+db_manager = create_database_manager()
+
+# Guardar paciente
+patient_data = {
+    'edad': 45, 'sexo': 'M', 'imc': 25.5,
+    'tas': 120, 'tad': 80, 'perimetro_abdominal': 90,
+    'realiza_ejercicio': 'Si', 'fuma': 'No'
+}
+patient_id = db_manager.save_patient(patient_data)
+
+# Guardar predicción
+prediction_data = {
+    'glucose_mg_dl': 95.5,
+    'category': 'Normal',
+    'risk_level': 'Bajo'
+}
+db_manager.save_prediction(patient_id, prediction_data, patient_data)
+
+# Obtener estadísticas
+stats = db_manager.get_database_stats()
+print(f'Total pacientes: {stats[\"total_patients\"]}')
+"
+```
+
+### 6. Monitoreo con MLflow
+```bash
+# Ver interfaz web de MLflow
+mlflow ui --backend-store-uri outputs/mlruns
+
+# En otra terminal, ejecutar experimentos
+python -c "
+from model_monitoring import log_training_session
+from model_trainer import train_diabetes_models
+
+# Entrenar y monitorear
+trainer = train_diabetes_models(df_processed, preprocessor)
+monitor = log_training_session(X_train_scaled, y_train, X_test_scaled, y_test, trainer.results)
+"
+```
+
+### 7. Uso Programático
+
+#### Predicción básica
 ```python
 from predictor import predict_glucose
 
-# Datos del paciente
 patient_data = {
-    'edad': 55,
-    'sexo': 'M',
-    'imc': 28.5,
-    'tas': 135,
-    'tad': 85,
-    'perimetro_abdominal': 95,
-    'realiza_ejercicio': 'No',
-    'fuma': 'No',
+    'edad': 55, 'sexo': 'M', 'imc': 28.5,
+    'tas': 135, 'tad': 85, 'perimetro_abdominal': 95,
+    'realiza_ejercicio': 'No', 'fuma': 'No',
     'historia_familiar_dm': 'Si'
 }
 
-# Hacer predicción
 result = predict_glucose(patient_data)
-print(f"Glucosa estimada: {result['glucose_mg_dl']} mg/dL")
+print(f"Glucosa: {result['glucose_mg_dl']} mg/dL")
 print(f"Categoría: {result['category']}")
 print(f"Riesgo: {result['risk_level']}")
+```
+
+#### Sistema completo
+```python
+from data_generator import create_sample_dataset
+from data_preprocessor import preprocess_diabetes_data
+from model_trainer import train_diabetes_models
+from predictor import predict_glucose
+from database_manager import create_database_manager
+
+# 1. Generar datos
+df = create_sample_dataset(1000)
+
+# 2. Preprocesar
+df_processed, preprocessor = preprocess_diabetes_data(df)
+
+# 3. Entrenar modelos
+trainer = train_diabetes_models(df_processed, preprocessor)
+
+# 4. Hacer predicción
+patient_data = df.iloc[0].drop('Resultado').to_dict()
+result = predict_glucose(patient_data)
+
+# 5. Guardar en BD
+db_manager = create_database_manager()
+patient_id = db_manager.save_patient(patient_data)
+db_manager.save_prediction(patient_id, result, patient_data)
 ```
 
 ## 📊 Modelos Implementados
@@ -197,11 +328,27 @@ print(f'Predicción: {result}')
 
 ## 📚 Dependencias Principales
 
+### Core (Originales)
 - **numpy, pandas, scipy**: Computación científica
 - **scikit-learn**: Machine learning
 - **xgboost, lightgbm**: Modelos de boosting
 - **matplotlib, seaborn**: Visualización
 - **joblib**: Serialización de modelos
+
+### Nuevas (Mejoras Implementadas)
+- **fastapi, uvicorn**: API REST
+- **streamlit**: Interfaz web
+- **optuna**: Optimización de hiperparámetros
+- **mlflow**: Monitoreo de modelos
+- **sqlalchemy**: Base de datos
+- **pydantic**: Validación de datos
+- **pytest**: Testing
+- **structlog**: Logging avanzado
+
+**Instalación:**
+```bash
+pip install -r requirements.txt
+```
 
 ## 🤝 Contribución
 
@@ -222,14 +369,134 @@ Para soporte técnico o preguntas:
 - Revisar la documentación
 - Verificar los ejemplos de uso
 
+## 🚀 Mejoras Implementadas
+
+### ✅ API REST (FastAPI)
+- **Endpoint:** `http://localhost:8000`
+- **Documentación:** `http://localhost:8000/docs`
+- **Funcionalidades:**
+  - Predicción individual: `POST /predict`
+  - Predicción batch: `POST /predict/batch`
+  - Información del modelo: `GET /model/info`
+  - Health check: `GET /health`
+  - Categorías: `GET /categories`
+  - Características: `GET /features`
+
+**Ejemplo de uso:**
+```bash
+# Iniciar API
+python api.py --host 0.0.0.0 --port 8000
+
+# Hacer predicción
+curl -X POST "http://localhost:8000/predict" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "edad": 45,
+       "sexo": "M",
+       "imc": 25.5,
+       "tas": 120,
+       "tad": 80,
+       "perimetro_abdominal": 90,
+       "realiza_ejercicio": "Si",
+       "fuma": "No",
+       "consume_alcohol": "Nunca",
+       "medicamentos_hta": "No",
+       "historia_familiar_dm": "Si",
+       "diabetes_gestacional": "No",
+       "puntaje_findrisc": 8,
+       "riesgo_cardiovascular": 0.3
+     }'
+```
+
+### ✅ Interfaz Web (Streamlit)
+- **Aplicación:** `http://localhost:8501`
+- **Funcionalidades:**
+  - Predicción individual interactiva
+  - Análisis batch con upload de CSV
+  - Visualizaciones avanzadas
+  - Información del sistema
+
+**Ejemplo de uso:**
+```bash
+# Iniciar interfaz web
+python web_app.py
+
+# O con configuración personalizada
+streamlit run web_app.py --server.port 8501 --server.address 0.0.0.0
+```
+
+### ✅ Optimización Automática de Hiperparámetros (Optuna)
+- **Modelos optimizados:** Random Forest, XGBoost, LightGBM, Gradient Boosting, Ridge, Lasso, SVR, Neural Network
+- **Métricas:** R², RMSE, MAE
+- **Validación cruzada:** 5-fold
+- **Funcionalidades:**
+  - Optimización bayesiana
+  - Logging de experimentos
+  - Guardado de resultados
+
+**Ejemplo de uso:**
+```python
+from hyperparameter_optimizer import optimize_diabetes_models
+
+# Optimizar modelos
+results = optimize_diabetes_models(
+    X_train_scaled, y_train, X_test_scaled, y_test,
+    models_to_optimize=["Random Forest", "XGBoost"],
+    n_trials=50
+)
+```
+
+### ✅ Sistema de Monitoreo (MLflow)
+- **Tracking:** Métricas, parámetros, artefactos
+- **Modelos:** Registro automático de modelos
+- **Visualizaciones:** Gráficos de rendimiento
+- **Comparación:** Múltiples experimentos
+
+**Ejemplo de uso:**
+```python
+from model_monitoring import log_training_session
+
+# Registrar sesión de entrenamiento
+monitor = log_training_session(X_train, y_train, X_test, y_test, model_results)
+
+# Ver historial
+history = monitor.get_experiment_history()
+```
+
+### ✅ Base de Datos Médica (SQLAlchemy)
+- **Tablas:** Patients, MedicalData, Predictions, ModelPerformance
+- **Funcionalidades:**
+  - Guardado de pacientes y datos médicos
+  - Registro de predicciones
+  - Historial médico completo
+  - Estadísticas y reportes
+  - Exportación a CSV
+
+**Ejemplo de uso:**
+```python
+from database_manager import create_database_manager
+
+# Crear gestor de BD
+db_manager = create_database_manager()
+
+# Guardar paciente
+patient_id = db_manager.save_patient(patient_data)
+
+# Guardar predicción
+prediction_id = db_manager.save_prediction(patient_id, prediction_data, input_data)
+
+# Obtener estadísticas
+stats = db_manager.get_database_stats()
+```
+
 ## 🔮 Próximas Mejoras
 
-- [ ] Implementación de API REST
-- [ ] Interfaz web para predicciones
-- [ ] Validación con datos reales
-- [ ] Sistema de monitoreo de modelos
-- [ ] Optimización automática de hiperparámetros
-- [ ] Integración con bases de datos médicas
+- [ ] Validación con datos reales de pacientes
+- [ ] Sistema de alertas médicas
+- [ ] Integración con sistemas hospitalarios (HL7, FHIR)
+- [ ] Modelos de deep learning
+- [ ] Análisis de tendencias temporales
+- [ ] Sistema de recomendaciones médicas
 
 ---
 
