@@ -10,8 +10,6 @@ services:
         value: "3.12"
       - key: PORT
         value: "8000"
-      - key: MLFLOW_TRACKING_URI
-        value: "https://delfos-biomarkers.onrender.com/mlflow"
       - key: RENDER
         value: "true"
     healthCheckPath: /health
@@ -27,15 +25,3 @@ services:
         value: "1"
       - key: PYTHONDONTWRITEBYTECODE
         value: "1"
-
-# Configuración de base de datos PostgreSQL
-databases:
-  - name: delfos-postgres
-    databaseName: delfos_medical
-    user: delfos_user
-    ipAllowList: [] # Solo accesible desde otros servicios de Render
-
-# Configuración de Redis para caché
-redis:
-  - name: delfos-redis
-    ipAllowList: [] # Solo accesible desde otros servicios de Render
