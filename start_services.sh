@@ -3,10 +3,10 @@
 # Script de inicio para Render - Sistema de Biomarcadores Digitales
 echo "🚀 Iniciando Sistema de Biomarcadores Digitales en Render..."
 
-# Función para verificar si un puerto está disponible
+# Función simple para verificar puerto usando netstat
 check_port() {
     local port=$1
-    if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null ; then
+    if netstat -tln | grep -q ":$port "; then
         echo "✅ Puerto $port está disponible"
         return 0
     else
@@ -32,7 +32,7 @@ start_service() {
         local pid=$!
 
         # Esperar un momento para que el servicio inicie
-        sleep 5
+        sleep 10
 
         # Verificar si el servicio está corriendo
         if check_port $port; then
@@ -48,61 +48,16 @@ start_service() {
     return 1
 }
 
-# Verificar si estamos en Render
-if [ -n "$RENDER" ]; then
-    echo "🌐 Detectado entorno Render"
-    HOST="0.0.0.0"
-    BASE_URL="https://delfos-biomarkers.onrender.com"
-else
-    echo "💻 Entorno local detectado"
-    HOST="127.0.0.1"
-    BASE_URL="http://localhost:8000"
-fi
-
 # Configurar variables de entorno para Render
-export MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI:-$BASE_URL/mlflow}
 export PORT=${PORT:-8000}
+export HOST=${HOST:-"0.0.0.0"}
 
 echo "🔧 Configuración:"
 echo "   Host: $HOST"
-echo "   Puerto principal: $PORT"
-echo "   MLflow URI: $MLFLOW_TRACKING_URI"
-echo "   Base URL: $BASE_URL"
+echo "   Puerto: $PORT"
 
 # Iniciar servicio principal
-echo "🚀 Iniciando servicio principal..."
+echo "🚀 Iniciando Delfos Biomarkers Service..."
 
-# Servicio principal que integra API y Dashboard
-echo "🔌 Iniciando Delfos Biomarkers Service..."
-start_service "Delfos Biomarkers" "python main.py" $PORT
-
-# Verificar estado del servicio principal
-echo "🔍 Verificando estado del servicio..."
-sleep 10
-
-if check_port $PORT; then
-    echo "✅ Delfos Biomarkers Service: $BASE_URL"
-    echo "   Health check: $BASE_URL/health"
-    echo "   Dashboard: $BASE_URL"
-    echo "   Info: $BASE_URL/info"
-    echo ""
-    echo "🎉 ¡Servicio iniciado exitosamente!"
-    echo ""
-    echo "📋 URLs de acceso:"
-    echo "   🌐 Dashboard: $BASE_URL"
-    echo "   🔌 API Predict: $BASE_URL/predict"
-    echo "   ℹ️ Información: $BASE_URL/info"
-    echo "   💚 Health Check: $BASE_URL/health"
-    echo ""
-    echo "⏳ Manteniendo servicio activo..."
-else
-    echo "❌ Servicio principal no responde"
-    echo "🔄 Revisa los logs para más detalles"
-    exit 1
-fi
-
-# Mantener el contenedor corriendo
-while true; do
-    sleep 30
-    echo "💚 Servicios activos - $(date)"
-done
+# Iniciar el servicio directamente sin verificaciones complejas
+python main.py
