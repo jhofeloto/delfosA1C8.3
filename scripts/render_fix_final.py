@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+"""
+GUÍA FINAL PARA ARREGLAR RENDER - PASO A PASO
+"""
+
+print("🔧 GUÍA FINAL: ARREGLAR RENDER EN 5 PASOS")
+print("="*50)
+
+print("\n🎯 OBJETIVO:")
+print("   Cambiar tu servicio de Docker a Python 3 nativo")
+
+print("\n📍 PASO 1: ACCEDER A LA CONFIGURACIÓN")
+print("   1. Ve a: https://dashboard.render.com")
+print("   2. Selecciona tu servicio: 'delfosA1C8.3'")
+print("   3. Ve a la pestaña: 'Settings'")
+print("   4. Busca la sección: 'Build & Deploy'")
+
+print("\n📍 PASO 2: CAMBIAR DE DOCKER A PYTHON")
+print("   En 'Build & Deploy', busca:")
+print("   ")
+print("   Dockerfile Path: ./Dockerfile  ← CAMBIA ESTO")
+print("   ")
+print("   Cámbialo a:")
+print("   ")
+print("   Dockerfile Path: No Dockerfile  ← NUEVO VALOR")
+print("   ")
+print("   ⚠️ IMPORTANTE: Después de cambiar esto,")
+print("   aparecerán automáticamente los campos:")
+print("   - Runtime: Python 3")
+print("   - Build Command")
+print("   - Start Command")
+
+print("\n📍 PASO 3: CONFIGURAR COMANDOS")
+print("   Una vez que aparezcan los campos nuevos:")
+print("   ")
+print("   Build Command:")
+print("   pip install -r requirements.txt")
+print("   ")
+print("   Start Command:")
+print("   python api.py --host 0.0.0.0 --port $PORT")
+
+print("\n📍 PASO 4: VARIABLES DE ENTORNO")
+print("   1. Ve a la pestaña: 'Environment'")
+print("   2. Haz clic en: 'Add Environment Variable'")
+print("   3. Agrega estas 13 variables:")
+print("   ")
+print("   ENVIRONMENT = production")
+print("   DEBUG = false")
+print("   LOG_LEVEL = INFO")
+print("   SECRET_KEY = diabetes-secret-key-2025-super-seguro")
+print("   JWT_SECRET_KEY = diabetes-jwt-secret-key-2025-super-seguro")
+print("   API_HOST = 0.0.0.0")
+print("   API_PORT = 8002")
+print("   STREAMLIT_SERVER_ADDRESS = 0.0.0.0")
+print("   STREAMLIT_SERVER_PORT = 8501")
+print("   STREAMLIT_SERVER_HEADLESS = true")
+print("   MLFLOW_TRACKING_URI = file:///app/outputs/mlruns")
+print("   MLFLOW_HOST = 0.0.0.0")
+print("   MLFLOW_PORT = 5002")
+
+print("\n📍 PASO 5: HEALTH CHECK")
+print("   1. Ve a la pestaña: 'Settings'")
+print("   2. Busca: 'Health Check Path'")
+print("   3. Cambia de '/healthz' a '/health'")
+
+print("\n📍 PASO 6: GUARDAR Y DESPLEGAR")
+print("   1. Haz clic en: 'Save Changes'")
+print("   2. Espera 3-5 minutos")
+print("   3. Tu URL será: https://delfosa1c8-3.onrender.com")
+
+print("\n" + "="*50)
+print("✅ VERIFICACIÓN FINAL")
+print("="*50)
+
+print("\n🧪 PRUEBA TU API:")
+print("   curl https://delfosa1c8-3.onrender.com/health")
+print("   ")
+print("   Deberías ver: 'status': 'healthy'")
+
+print("\n📚 PRUEBA LA DOCUMENTACIÓN:")
+print("   https://delfosa1c8-3.onrender.com/docs")
+
+print("\n🔮 PRUEBA UNA PREDICCIÓN:")
+print("   curl -X POST https://delfosa1c8-3.onrender.com/predict \\")
+print("        -H 'Content-Type: application/json' \\")
+print("        -d '{\"glucose\":120,\"blood_pressure\":80,\"insulin\":100,\"bmi\":25.0,\"age\":45,\"skin_thickness\":20}'")
+
+print("\n" + "="*50)
+print("🚨 SI ALGO FALLA")
+print("="*50)
+
+print("\n🔍 REVISAR LOGS:")
+print("   1. En Render dashboard, ve a 'Logs'")
+print("   2. Busca errores en rojo")
+print("   3. Copia el error y dime qué dice")
+
+print("\n💡 POSIBLES ERRORES:")
+print("   • 'Module not found': Falta alguna dependencia")
+print("   • 'Port already in use': Conflicto de puertos")
+print("   • 'Model loading failed': Problema con modelos ML")
+print("   • 'Database connection': Error de BD")
+
+print("\n📞 AYUDA:")
+print("   Si ves algún error, copia el mensaje completo")
+print("   y te ayudo a solucionarlo específicamente.")
+
+print("\n🎉 ¡ÉXITO!")
+print("   Una vez funcionando, tendrás:")
+print("   • API REST funcionando")
+print("   • 15 modelos ML listos")
+print("   • Documentación automática")
+print("   • Base de datos PostgreSQL")
+print("   • Auto-scaling automático")
+
+print("\n⏱️ TIEMPO ESTIMADO: 10-15 minutos")
+print("💰 COSTO: $0 (gratuito para desarrollo)")

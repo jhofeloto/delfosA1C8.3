@@ -1,0 +1,36 @@
+RESULTADOS DE PRUEBAS - lunes, 22 de septiembre de 2025, 19:06:03 -05
+================================
+URL del Sistema: https://Service Domain created:
+🚀 https://delfosa1c83-production.up.railway.app
+
+SERVICIOS:
+- API REST: ❌ ERROR
+- Predicciones: ❌ ERROR
+- Streamlit: ✅ OK
+- MLflow UI: ✅ OK
+
+PRUEBAS REALIZADAS:
+✅ Health Check API
+✅ Predicción de prueba
+✅ Modelos disponibles
+✅ Interfaz web accesible
+✅ MLflow UI accesible
+
+DATOS DE PRUEBA USADOS:
+{
+    "edad": 45,
+    "sexo": "M",
+    "imc": 28.5,
+    "tas": 135,
+    "tad": 85,
+    "perimetro_abdominal": 95,
+    "frecuencia_cardiaca": 75,
+    "realiza_ejercicio": "Si",
+    "consume_alcohol": "Ocasional",
+    "fuma": "No",
+    "medicamentos_hta": "No",
+    "historia_familiar_dm": "Si",
+    "diabetes_gestacional": "No",
+    "puntaje_findrisc": 8,
+    "riesgo_cardiovascular": 0.15
+}

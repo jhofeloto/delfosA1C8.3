@@ -83,10 +83,14 @@ done
 # Variables específicas para TEST
 railway variables set DEBUG="true" --environment test
 railway variables set API_WORKERS="1" --environment test
+railway variables set SECRET_KEY="test-secret-key-12345" --environment test
+railway variables set JWT_SECRET_KEY="test-jwt-secret-12345" --environment test
 
 # Variables específicas para PRODUCTION
 railway variables set DEBUG="false" --environment production
 railway variables set API_WORKERS="4" --environment production
+railway variables set SECRET_KEY="prod-secret-key-super-seguro-2025" --environment production
+railway variables set JWT_SECRET_KEY="prod-jwt-secret-super-seguro-2025" --environment production
 
 echo -e "${BLUE}📊 Verificando servicios configurados...${NC}"
 railway status
