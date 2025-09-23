@@ -109,13 +109,23 @@ def get_predictor() -> DiabetesPredictor:
 async def health_check():
     """Health check del servicio"""
     global prediction_counter
-    predictor_instance = get_predictor()
+
+    # Intentar obtener el predictor, pero no fallar si hay problemas
+    predictor_instance = None
+    model_loaded = False
+
+    try:
+        predictor_instance = get_predictor()
+        model_loaded = predictor_instance.model is not None
+    except Exception as e:
+        logger.error(f"Error cargando predictor en health check: {e}")
+        model_loaded = False
 
     return HealthResponse(
-        status="healthy",
+        status="healthy" if model_loaded else "degraded",
         timestamp=datetime.now(),
         version="2.0.0",
-        model_loaded=predictor_instance.model is not None,
+        model_loaded=model_loaded,
         total_predictions=prediction_counter
     )
 
