@@ -69,67 +69,34 @@ echo "   Puerto principal: $PORT"
 echo "   MLflow URI: $MLFLOW_TRACKING_URI"
 echo "   Base URL: $BASE_URL"
 
-# Iniciar servicios
-echo "📊 Iniciando servicios..."
+# Iniciar servicio principal
+echo "🚀 Iniciando servicio principal..."
 
-# 1. MLflow UI (background)
-echo "🔬 Iniciando MLflow UI..."
-start_service "MLflow UI" "python -m mlflow ui --backend-store-uri mlruns --host $HOST --port 5004" 5004
+# Servicio principal que integra API y Dashboard
+echo "🔌 Iniciando Delfos Biomarkers Service..."
+start_service "Delfos Biomarkers" "python main.py" $PORT
 
-# 2. API Service (principal)
-echo "🔌 Iniciando API Service..."
-start_service "API Service" "uvicorn api_service:app --host $HOST --port $PORT --workers 2" $PORT
-
-# 3. Dashboard Service (background)
-echo "📱 Iniciando Dashboard Service..."
-start_service "Dashboard Service" "streamlit run dashboard_service.py --server.port 8501 --server.address $HOST --server.headless true" 8501
-
-# Verificar estado de todos los servicios
-echo "🔍 Verificando estado de servicios..."
+# Verificar estado del servicio principal
+echo "🔍 Verificando estado del servicio..."
 sleep 10
 
-all_services_ok=true
-
-if check_port 5004; then
-    echo "✅ MLflow UI: $BASE_URL/mlflow"
-else
-    echo "❌ MLflow UI no responde"
-    all_services_ok=false
-fi
-
 if check_port $PORT; then
-    echo "✅ API Service: $BASE_URL"
+    echo "✅ Delfos Biomarkers Service: $BASE_URL"
     echo "   Health check: $BASE_URL/health"
-    echo "   API Docs: $BASE_URL/docs"
-else
-    echo "❌ API Service no responde"
-    all_services_ok=false
-fi
-
-if check_port 8501; then
-    echo "✅ Dashboard: $BASE_URL/dashboard"
-else
-    echo "❌ Dashboard no responde"
-    all_services_ok=false
-fi
-
-if [ "$all_services_ok" = true ]; then
-    echo "🎉 ¡Todos los servicios iniciados exitosamente!"
+    echo "   Dashboard: $BASE_URL"
+    echo "   Info: $BASE_URL/info"
+    echo ""
+    echo "🎉 ¡Servicio iniciado exitosamente!"
     echo ""
     echo "📋 URLs de acceso:"
-    echo "   🌐 Aplicación: $BASE_URL"
-    echo "   🔬 MLflow UI: $BASE_URL/mlflow"
-    echo "   🔌 API Docs: $BASE_URL/docs"
-    echo "   📱 Dashboard: $BASE_URL/dashboard"
+    echo "   🌐 Dashboard: $BASE_URL"
+    echo "   🔌 API Predict: $BASE_URL/predict"
+    echo "   ℹ️ Información: $BASE_URL/info"
+    echo "   💚 Health Check: $BASE_URL/health"
     echo ""
-    echo "💡 Para desarrollo local:"
-    echo "   🔬 MLflow UI: http://localhost:5004"
-    echo "   🔌 API Service: http://localhost:$PORT"
-    echo "   📱 Dashboard: http://localhost:8501"
-    echo ""
-    echo "⏳ Manteniendo servicios activos..."
+    echo "⏳ Manteniendo servicio activo..."
 else
-    echo "⚠️  Algunos servicios no se iniciaron correctamente"
+    echo "❌ Servicio principal no responde"
     echo "🔄 Revisa los logs para más detalles"
     exit 1
 fi

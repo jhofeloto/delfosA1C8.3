@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información del Sistema - Delfos Biomarkers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-blue-900 mb-2">ℹ️ Información del Sistema</h1>
+            <p class="text-gray-600">Sistema de Biomarcadores Digitales para predicción de diabetes</p>
+        </header>
+
+        <div class="max-w-4xl mx-auto space-y-6">
+            <!-- Información General -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">📋 Información General</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="font-semibold text-gray-700">Versión del Sistema</h3>
+                        <p class="text-gray-600">1.0</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-700">Framework Principal</h3>
+                        <p class="text-gray-600">FastAPI + MLflow</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-700">Modelos de ML</h3>
+                        <p class="text-gray-600">Random Forest, Gradient Boosting</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-700">Interfaz Web</h3>
+                        <p class="text-gray-600">HTML + TailwindCSS + Alpine.js</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Características -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">✨ Características</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✅</span>
+                            Predicción de diabetes en tiempo real
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✅</span>
+                            Evaluación de múltiples factores de riesgo
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✅</span>
+                            Interfaz web intuitiva y responsiva
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✅</span>
+                            Modelos de machine learning validados
+                        </li>
+                    </ul>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✅</span>
+                            Seguimiento de métricas de rendimiento
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✅</span>
+                            API REST para integración
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✅</span>
+                            Despliegue optimizado para producción
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✅</span>
+                            Monitoreo de salud del servicio
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Variables de Predicción -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">🔬 Variables de Predicción</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="p-3 bg-blue-50 rounded">
+                        <h4 class="font-semibold text-blue-800">Demográficas</h4>
+                        <p class="text-sm text-blue-600">Edad, Sexo</p>
+                    </div>
+                    <div class="p-3 bg-green-50 rounded">
+                        <h4 class="font-semibold text-green-800">Clínicas</h4>
+                        <p class="text-sm text-green-600">IMC, TAS, TAD, Perímetro Abdominal</p>
+                    </div>
+                    <div class="p-3 bg-purple-50 rounded">
+                        <h4 class="font-semibold text-purple-800">Estilo de Vida</h4>
+                        <p class="text-sm text-purple-600">Ejercicio, Alcohol, Tabaco</p>
+                    </div>
+                    <div class="p-3 bg-yellow-50 rounded">
+                        <h4 class="font-semibold text-yellow-800">Historial Médico</h4>
+                        <p class="text-sm text-yellow-600">Medicamentos, Historia Familiar</p>
+                    </div>
+                    <div class="p-3 bg-red-50 rounded">
+                        <h4 class="font-semibold text-red-800">Evaluación de Riesgo</h4>
+                        <p class="text-sm text-red-600">FINDRISC, Riesgo Cardiovascular</p>
+                    </div>
+                    <div class="p-3 bg-indigo-50 rounded">
+                        <h4 class="font-semibold text-indigo-800">Vitales</h4>
+                        <p class="text-sm text-indigo-600">Frecuencia Cardíaca</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instrucciones de Uso -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">📖 Instrucciones de Uso</h2>
+                <div class="space-y-4 text-gray-600">
+                    <div>
+                        <h4 class="font-semibold text-gray-700">1. Completar el Formulario</h4>
+                        <p>Ingrese todos los datos médicos y de estilo de vida del paciente de manera precisa.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-700">2. Realizar la Predicción</h4>
+                        <p>Haga clic en "Realizar Predicción" para obtener el resultado del modelo de machine learning.</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-700">3. Interpretar Resultados</h4>
+                        <p>Revise la predicción, probabilidad y nivel de riesgo. Considere evaluación médica adicional si es necesario.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navegación -->
+            <div class="text-center">
+                <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 inline-flex items-center">
+                    ← Volver al Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

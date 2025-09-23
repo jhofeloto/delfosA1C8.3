@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Biomarcadores Digitales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-blue-900 mb-2">🏥 Sistema de Biomarcadores Digitales</h1>
+            <p class="text-gray-600">Predicción de Diabetes con Machine Learning</p>
+        </header>
+
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6">🔮 Predicción Individual</h2>
+
+                <form x-data="predictionForm()" @submit.prevent="submitPrediction" class="space-y-6">
+                    <!-- Información Personal -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Edad</label>
+                            <input type="number" x-model="form.edad" min="18" max="100"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Sexo</label>
+                            <select x-model="form.sexo"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="0">Masculino</option>
+                                <option value="1">Femenino</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">IMC</label>
+                            <input type="number" x-model="form.imc" step="0.1" min="15" max="50"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Signos Vitales -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">TAS (mmHg)</label>
+                            <input type="number" x-model="form.tas" min="80" max="200"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">TAD (mmHg)</label>
+                            <input type="number" x-model="form.tad" min="50" max="130"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Perímetro Abdominal (cm)</label>
+                            <input type="number" x-model="form.perimetro_abdominal" min="50" max="150"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Factores de Riesgo -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Frecuencia Cardíaca</label>
+                            <input type="number" x-model="form.frecuencia_cardiaca" min="40" max="200"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Puntaje FINDRISC</label>
+                            <input type="number" x-model="form.puntaje_findrisc" min="0" max="26"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Riesgo Cardiovascular</label>
+                            <input type="number" x-model="form.riesgo_cardiovascular" step="0.1" min="0" max="1"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- Estilo de Vida -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Realiza Ejercicio</label>
+                            <select x-model="form.realiza_ejercicio"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="1">Sí</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Consume Alcohol</label>
+                            <select x-model="form.consume_alcohol"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="0">Nunca</option>
+                                <option value="1">Ocasional</option>
+                                <option value="2">Frecuente</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Fuma</label>
+                            <select x-model="form.fuma"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="0">No</option>
+                                <option value="1">Sí</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Historial Médico -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Medicamentos HTA</label>
+                            <select x-model="form.medicamentos_hta"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="0">No</option>
+                                <option value="1">Sí</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Historia Familiar DM</label>
+                            <select x-model="form.historia_familiar_dm"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="0">No</option>
+                                <option value="1">Sí</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Diabetes Gestacional</label>
+                        <select x-model="form.diabetes_gestacional"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="0">No</option>
+                            <option value="1">Sí</option>
+                        </select>
+                    </div>
+
+                    <!-- Botón de predicción -->
+                    <div class="text-center">
+                        <button type="submit"
+                                :disabled="loading"
+                                class="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-8 rounded-lg transition duration-200 flex items-center justify-center mx-auto">
+                            <span x-show="!loading">🔮 Realizar Predicción</span>
+                            <span x-show="loading" class="flex items-center">
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Procesando...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Resultados -->
+                <div x-show="result" x-transition class="mt-8 p-6 bg-gray-50 rounded-lg">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">📊 Resultados de la Predicción</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="text-center p-4 bg-white rounded-lg">
+                            <div class="text-2xl font-bold" :class="result?.prediction === 1 ? 'text-red-600' : 'text-green-600'">
+                                <span x-text="result?.prediction === 1 ? 'Diabetes' : 'Sin Diabetes'"></span>
+                            </div>
+                            <div class="text-sm text-gray-600">Predicción</div>
+                        </div>
+
+                        <div class="text-center p-4 bg-white rounded-lg">
+                            <div class="text-2xl font-bold text-blue-600">
+                                <span x-text="(result?.probability * 100).toFixed(1) + '%'"></span>
+                            </div>
+                            <div class="text-sm text-gray-600">Probabilidad</div>
+                        </div>
+
+                        <div class="text-center p-4 bg-white rounded-lg">
+                            <div class="text-2xl font-bold" :class="result?.risk_level === 'High' ? 'text-red-600' : result?.risk_level === 'Medium' ? 'text-yellow-600' : 'text-green-600'">
+                                <span x-text="result?.risk_level"></span>
+                            </div>
+                            <div class="text-sm text-gray-600">Nivel de Riesgo</div>
+                        </div>
+                    </div>
+
+                    <!-- Alerta -->
+                    <div x-show="result?.prediction === 1"
+                         class="p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+                        <div class="flex">
+                            <div class="ml-3">
+                                <p class="text-sm">⚠️ <strong>Riesgo Alto de Diabetes</strong> - Se recomienda evaluación médica inmediata</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div x-show="result?.prediction === 0"
+                         class="p-4 bg-green-100 border-l-4 border-green-500 text-green-700">
+                        <div class="flex">
+                            <div class="ml-3">
+                                <p class="text-sm">✅ <strong>Riesgo Bajo</strong> - Mantener hábitos saludables</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function predictionForm() {
+            return {
+                loading: false,
+                result: null,
+                form: {
+                    edad: 45,
+                    sexo: 0,
+                    imc: 25.0,
+                    tas: 120,
+                    tad: 80,
+                    perimetro_abdominal: 85,
+                    frecuencia_cardiaca: 70,
+                    realiza_ejercicio: 1,
+                    consume_alcohol: 0,
+                    fuma: 0,
+                    medicamentos_hta: 0,
+                    historia_familiar_dm: 0,
+                    diabetes_gestacional: 0,
+                    puntaje_findrisc: 8,
+                    riesgo_cardiovascular: 0.2
+                },
+
+                async submitPrediction() {
+                    this.loading = true;
+                    this.result = null;
+
+                    try {
+                        const response = await fetch('/predict', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(this.form)
+                        });
+
+                        if (response.ok) {
+                            this.result = await response.json();
+                        } else {
+                            const error = await response.text();
+                            alert('Error en la predicción: ' + error);
+                        }
+                    } catch (error) {
+                        alert('Error de conexión: ' + error.message);
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

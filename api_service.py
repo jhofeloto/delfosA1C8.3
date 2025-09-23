@@ -4,6 +4,9 @@ from pydantic import BaseModel
 import mlflow.pyfunc
 import pandas as pd
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Diabetes Prediction API", version="1.0")
 
