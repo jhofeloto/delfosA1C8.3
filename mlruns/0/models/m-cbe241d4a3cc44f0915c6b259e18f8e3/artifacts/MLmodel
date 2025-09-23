@@ -1,0 +1,22 @@
+artifact_path: file:///Users/jhofeloto/Library/CloudStorage/GoogleDrive-jhofeloto%4041gu5.com/Unidades%20compartidas/111598%20%7C%20Entregables%20Delfos%203/Nodriza/7%20-%20Informe%20de%20Resultados%20de%20los%20Modelos%20de%20ML%20y%20DL/7.2%20Informe%20Intermedio%20de%20Ajustes/A1%20Modelo/delfosA1C8.3/mlruns/0/models/m-cbe241d4a3cc44f0915c6b259e18f8e3/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.2
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.2
+mlflow_version: 3.4.0
+model_id: m-cbe241d4a3cc44f0915c6b259e18f8e3
+model_size_bytes: 387860
+model_uuid: m-cbe241d4a3cc44f0915c6b259e18f8e3
+prompts: null
+run_id: 23b958e889234ff2a5ec63fbff1891b2
+utc_time_created: '2025-09-23 14:54:58.048510'

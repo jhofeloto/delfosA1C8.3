@@ -1,0 +1,10 @@
+artifact_location: file:///Users/jhofeloto/Library/CloudStorage/GoogleDrive-jhofeloto%4041gu5.com/Unidades%20compartidas/111598%20%7C%20Entregables%20Delfos%203/Nodriza/7%20-%20Informe%20de%20Resultados%20de%20los%20Modelos%20de%20ML%20y%20DL/7.2%20Informe%20Intermedio%20de%20Ajustes/A1%20Modelo/delfosA1C8.3/mlruns/0/models/m-cbe241d4a3cc44f0915c6b259e18f8e3/artifacts
+creation_timestamp: 1758639297853
+experiment_id: '0'
+last_updated_timestamp: 1758639301967
+model_id: m-cbe241d4a3cc44f0915c6b259e18f8e3
+model_type: null
+name: model
+source_run_id: 23b958e889234ff2a5ec63fbff1891b2
+status: 2
+status_message: null

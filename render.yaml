@@ -1,98 +1,41 @@
 services:
-  # API REST del Sistema Predictivo de Diabetes
   - type: web
-    name: diabetes-api
-    runtime: python3
-    buildCommand: pip install -r requirements.txt
-    startCommand: python api.py --host 0.0.0.0 --port $PORT
-    healthCheckPath: /health
+    name: delfos-biomarkers
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    buildCommand: ""
+    startCommand: "./start_services.sh"
     envVars:
-      - key: ENVIRONMENT
-        value: production
-      - key: DEBUG
-        value: false
-      - key: LOG_LEVEL
-        value: INFO
-      - key: SECRET_KEY
-        generateValue: true
-      - key: JWT_SECRET_KEY
-        generateValue: true
-      - key: API_HOST
-        value: 0.0.0.0
-      - key: API_PORT
-        value: 8002
-      - key: STREAMLIT_SERVER_ADDRESS
-        value: 0.0.0.0
-      - key: STREAMLIT_SERVER_PORT
-        value: 8501
-      - key: STREAMLIT_SERVER_HEADLESS
-        value: true
-      - key: MLFLOW_TRACKING_URI
-        value: ./outputs/mlruns
-      - key: MLFLOW_HOST
-        value: 0.0.0.0
-      - key: MLFLOW_PORT
-        value: 5002
-
-  # Interfaz Web Streamlit
-  - type: web
-    name: diabetes-streamlit
-    runtime: python3
-    buildCommand: pip install -r requirements.txt
-    startCommand: streamlit run web_app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
-    healthCheckPath: /
-    envVars:
-      - key: ENVIRONMENT
-        value: production
-      - key: DEBUG
-        value: false
-      - key: LOG_LEVEL
-        value: INFO
-      - key: STREAMLIT_SERVER_ADDRESS
-        value: 0.0.0.0
-      - key: STREAMLIT_SERVER_PORT
-        value: 8501
-      - key: STREAMLIT_SERVER_HEADLESS
-        value: true
-      - key: MLFLOW_TRACKING_URI
-        value: ./outputs/mlruns
-      - key: API_BASE_URL
-        value: https://delfosa1c8-3.onrender.com
-
-  # Sistema MLflow UI
-  - type: web
-    name: diabetes-mlflow
-    runtime: python3
-    buildCommand: pip install -r requirements.txt
-    startCommand: python scripts/start_mlflow.py
-    healthCheckPath: /
-    healthCheckTimeout: 120
-    envVars:
-      - key: ENVIRONMENT
-        value: production
-      - key: DEBUG
-        value: false
-      - key: LOG_LEVEL
-        value: INFO
-      - key: MLFLOW_TRACKING_URI
-        value: /app/outputs/mlruns
-      - key: MLFLOW_HOST
-        value: 0.0.0.0
-      - key: MLFLOW_PORT
-        value: 5000
-      - key: MLFLOW_BACKEND_STORE_URI
-        value: /app/outputs/mlruns
-      - key: HOME
-        value: /app
+      - key: PYTHON_VERSION
+        value: "3.12"
       - key: PORT
-        value: 5000
+        value: "8000"
+      - key: MLFLOW_TRACKING_URI
+        value: "https://delfos-biomarkers.onrender.com/mlflow"
+      - key: RENDER
+        value: "true"
+    healthCheckPath: /health
+    autoDeploy: true
+    disk:
+      name: delfos-data
+      mountPath: /app
+      sizeGB: 10
+    envs:
+      - key: NODE_ENV
+        value: "production"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: PYTHONDONTWRITEBYTECODE
+        value: "1"
 
-  # Base de datos PostgreSQL
-  - type: pserv
-    name: diabetes-db
-    envVars:
-      - key: DATABASE_URL
-        fromService:
-          type: pserv
-          name: diabetes-db
-          property: connectionString
+# Configuración de base de datos PostgreSQL
+databases:
+  - name: delfos-postgres
+    databaseName: delfos_medical
+    user: delfos_user
+    ipAllowList: [] # Solo accesible desde otros servicios de Render
+
+# Configuración de Redis para caché
+redis:
+  - name: delfos-redis
+    ipAllowList: [] # Solo accesible desde otros servicios de Render

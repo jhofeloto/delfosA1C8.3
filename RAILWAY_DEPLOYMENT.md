@@ -1,401 +1,321 @@
-# 🚀 **DESPLIEGUE EN RAILWAY - SISTEMA PREDICTIVO DE DIABETES**
+# 🚀 Despliegue en Railway - Sistema de Biomarcadores Digitales
 
-## 📋 **VISIÓN GENERAL**
+Este documento describe el proceso de despliegue del Sistema de Biomarcadores Digitales en Railway.
 
-Este documento describe el proceso completo para desplegar el Sistema Predictivo de Diabetes en Railway con ambientes separados de **test** y **producción**.
+## 📋 Requisitos Previos
 
----
-
-## 🏗️ **ARQUITECTURA EN RAILWAY**
-
-```
-🌐 Railway Project
-├── 🏥 API REST (Puerto 8002)
-├── 📊 Streamlit Web App (Puerto 8501)
-├── 📈 MLflow UI (Puerto 5002)
-├── 🗄️ PostgreSQL Database
-└── 💾 Persistent Volumes (models, logs, mlruns)
-```
-
-### **Ambientes Disponibles:**
-- **🟢 Test:** Para desarrollo y pruebas
-- **🔴 Production:** Para uso en producción
-
----
-
-## ⚡ **DESPLIEGUE RÁPIDO**
-
-### **Paso 1: Preparación**
+### 1. Railway CLI
 ```bash
-# Clonar el repositorio
-git clone <tu-repositorio>
-cd diabetes-prediction-system
-
-# Ejecutar configuración inicial
-chmod +x scripts/setup_railway.sh
-./scripts/setup_railway.sh
+npm install -g @railway/cli
 ```
 
-### **Paso 2: Deploy a Test**
+### 2. Cuenta Railway
+- Crear cuenta en [Railway](https://railway.app)
+- Instalar Railway CLI y autenticarse
+
+### 3. Repositorio Git
+- El proyecto debe estar en un repositorio Git
+- Hacer commit de todos los cambios
+
+## 🏗️ Arquitectura del Despliegue
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Railway App   │    │   PostgreSQL    │    │     Redis       │
+│                 │    │   Database      │    │     Cache       │
+│ • API Service   │    │                 │    │                 │
+│ • MLflow UI     │    │ • Patient Data  │    │ • Session Cache │
+│ • Dashboard     │    │ • Model Metrics │    │ • API Responses │
+│ • Model Server  │    │ • Audit Logs    │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌─────────────────┐
+                    │   External      │
+                    │   Services      │
+                    │                 │
+                    │ • HL7 FHIR      │
+                    │ • Dify.ai       │
+                    │ • Medical APIs  │
+                    └─────────────────┘
+```
+
+## 🔧 Configuración
+
+### 1. Variables de Entorno
 ```bash
-# Deploy automático a ambiente de test
-./scripts/deploy_test.sh
+# Configuración de Railway
+RAILWAY_ENVIRONMENT=production
+PORT=8000
+
+# MLflow
+MLFLOW_TRACKING_URI=https://your-app.railway.app/mlflow
+MLFLOW_S3_ENDPOINT_URL=https://your-app.railway.app/mlflow-artifacts
+
+# Base de Datos
+DATABASE_URL=postgresql://user:pass@host:5432/dbname
+
+# Redis
+REDIS_URL=redis://host:port
+
+# API Keys
+OPENAI_API_KEY=your-openai-key
+DIFY_API_KEY=your-dify-key
+
+# Seguridad
+JWT_SECRET_KEY=your-jwt-secret
+API_SECRET_KEY=your-api-secret
 ```
 
-### **Paso 3: Deploy a Producción**
+### 2. Servicios Configurados
+
+#### API Service (Puerto 8000)
+- **Framework**: FastAPI
+- **Funcionalidad**: Endpoints de predicción y gestión de pacientes
+- **Workers**: 4 (escalable)
+- **Health Check**: `/health`
+
+#### MLflow UI (Puerto 5004)
+- **Funcionalidad**: Interfaz de gestión de experimentos ML
+- **Backend Store**: Local (mlruns/)
+- **Artifact Store**: S3 compatible
+- **Health Check**: `/`
+
+#### Dashboard (Puerto 8501)
+- **Framework**: Streamlit
+- **Funcionalidad**: Interfaz de usuario para predicciones
+- **Modo**: Headless
+- **Health Check**: `/`
+
+## 🚀 Proceso de Despliegue
+
+### Opción 1: Despliegue Automático (Recomendado)
+
 ```bash
-# Deploy a ambiente de producción
-./scripts/deploy_production.sh
+# Ejecutar script de despliegue
+./deploy_railway.sh
 ```
 
----
+### Opción 2: Despliegue Manual
 
-## 📁 **ESTRUCTURA DE ARCHIVOS**
-
-```
-📦 diabetes-prediction-system/
-├── 🏗️ railway.toml          # Configuración Railway
-├── 🐳 Dockerfile             # Imagen Docker
-├── 📋 .env.example           # Variables de entorno
-├── 📜 requirements.txt       # Dependencias Python
-├── 🏥 api.py                 # API REST
-├── 📊 web_app.py             # Streamlit App
-├── 📈 predictor.py           # Lógica de predicción
-├── 🤖 models/                # Modelos ML
-├── 📊 outputs/mlruns/        # Datos MLflow
-└── 📜 scripts/
-    ├── setup_railway.sh      # Config inicial
-    ├── deploy_test.sh        # Deploy test
-    └── deploy_production.sh  # Deploy prod
-```
-
----
-
-## ⚙️ **CONFIGURACIÓN DETALLADA**
-
-### **1. railway.toml**
-Configura múltiples servicios con diferentes puertos y variables de entorno específicas para cada ambiente.
-
-### **2. Dockerfile**
-- ✅ Python 3.12 slim
-- ✅ Instala dependencias del sistema
-- ✅ Copia modelos y datos MLflow
-- ✅ Configura directorios persistentes
-- ✅ Health check automático
-
-### **3. Variables de Entorno**
-
-#### **Variables Globales:**
 ```bash
-ENVIRONMENT=test|production
-LOG_LEVEL=DEBUG|INFO|WARNING
-DEBUG=true|false
+# 1. Conectar proyecto Railway
+railway link
+
+# 2. Configurar variables de entorno
+railway variables set PYTHON_VERSION=3.12
+railway variables set MLFLOW_TRACKING_URI=https://your-app.railway.app/mlflow
+
+# 3. Desplegar aplicación
+railway up
+
+# 4. Ver logs
+railway logs
+
+# 5. Abrir aplicación
+railway open
 ```
 
-#### **API REST (Puerto 8002):**
+## 📊 Monitoreo y Logs
+
+### Ver Logs en Tiempo Real
 ```bash
-API_HOST=0.0.0.0
-API_PORT=8002
-API_WORKERS=1|4
-API_TIMEOUT=30
+railway logs --follow
 ```
 
-#### **Streamlit (Puerto 8501):**
+### Ver Logs de Servicios Específicos
 ```bash
-STREAMLIT_SERVER_ADDRESS=0.0.0.0
-STREAMLIT_SERVER_PORT=8501
-STREAMLIT_SERVER_HEADLESS=true
+railway logs --service api
+railway logs --service mlflow
+railway logs --service dashboard
 ```
 
-#### **MLflow (Puerto 5002):**
+### Estado de la Aplicación
 ```bash
-MLFLOW_TRACKING_URI=file:///app/outputs/mlruns
-MLFLOW_HOST=0.0.0.0
-MLFLOW_PORT=5002
+railway status
 ```
 
-#### **Base de Datos:**
+## 🔍 Health Checks
+
+### API Service
 ```bash
-DATABASE_URL=postgresql://...
-DB_HOST=postgresql.railway.internal
-DB_PORT=5432
+curl https://your-app.railway.app/health
 ```
 
----
-
-## 🚀 **PROCESO DE DESPLIEGUE**
-
-### **FASE 1: Configuración Inicial**
-
-1. **Crear cuenta Railway** (si no tienes)
-2. **Instalar Railway CLI:**
-   ```bash
-   curl -fsSL https://railway.app/install.sh | sh
-   ```
-
-3. **Configurar proyecto:**
-   ```bash
-   railway login
-   railway link
-   ./scripts/setup_railway.sh
-   ```
-
-### **FASE 2: Deploy a Test**
-
-1. **Ejecutar deploy:**
-   ```bash
-   ./scripts/deploy_test.sh
-   ```
-
-2. **Verificar servicios:**
-   ```bash
-   railway status --environment test
-   railway logs --environment test
-   ```
-
-3. **URLs de Test:**
-   - API: `https://diabetes-api-test.up.railway.app`
-   - Streamlit: `https://diabetes-streamlit-test.up.railway.app`
-   - MLflow: `https://diabetes-mlflow-test.up.railway.app`
-
-### **FASE 3: Deploy a Producción**
-
-1. **Configurar variables de seguridad:**
-   ```bash
-   ./scripts/deploy_production.sh
-   ```
-
-2. **Verificar health check:**
-   ```bash
-   curl https://diabetes-api-production.up.railway.app/health
-   ```
-
-3. **URLs de Producción:**
-   - API: `https://diabetes-api-production.up.railway.app`
-   - Streamlit: `https://diabetes-streamlit-production.up.railway.app`
-   - MLflow: `https://diabetes-mlflow-production.up.railway.app`
-
----
-
-## 🔧 **COMANDOS ÚTILES DE RAILWAY**
-
-### **Gestión de Ambientes:**
+### MLflow UI
 ```bash
-railway environments          # Listar ambientes
-railway environment create    # Crear ambiente
-railway environment destroy   # Eliminar ambiente
+curl https://your-app.railway.app/
 ```
 
-### **Variables de Entorno:**
+### Dashboard
 ```bash
-railway variables             # Ver variables
-railway variables set KEY=VALUE --environment test
-railway variables delete KEY --environment production
+curl https://your-app.railway.app/
 ```
 
-### **Logs y Monitoreo:**
-```bash
-railway logs                  # Logs en tiempo real
-railway logs --environment test
-railway logs --service api    # Logs de servicio específico
-```
+## 🛠️ Troubleshooting
 
-### **Gestión de Servicios:**
-```bash
-railway status                # Estado de servicios
-railway domain                # URLs de servicios
-railway open                  # Abrir en navegador
-```
-
----
-
-## 📊 **MONITOREO Y MANTENIMIENTO**
-
-### **Health Checks:**
-- ✅ API: `/health` endpoint
-- ✅ Streamlit: Página principal
-- ✅ MLflow: UI accesible
-
-### **Logs Importantes:**
-```bash
-# Ver logs de API
-railway logs --service diabetes-api-test
-
-# Ver logs de Streamlit
-railway logs --service diabetes-streamlit-test
-
-# Ver logs de MLflow
-railway logs --service diabetes-mlflow-test
-```
-
-### **Métricas a Monitorear:**
-- ⏱️ **Tiempo de respuesta** de la API
-- 📊 **Uso de CPU y memoria**
-- 💾 **Espacio en disco** (modelos, logs)
-- 🔄 **Estado de servicios**
-
----
-
-## 🔒 **SEGURIDAD EN PRODUCCIÓN**
-
-### **Variables Sensibles:**
-```bash
-# Configurar en Railway dashboard:
-SECRET_KEY=tu-secret-key-super-seguro
-JWT_SECRET_KEY=tu-jwt-secret-key
-DATABASE_URL=postgresql://user:pass@host:5432/db
-```
-
-### **Configuraciones de Seguridad:**
-- ✅ **Debug = false** en producción
-- ✅ **Logs nivel WARNING** en producción
-- ✅ **Variables de entorno** encriptadas
-- ✅ **Health checks** habilitados
-- ✅ **Auto-scaling** configurado
-
----
-
-## 🆘 **SOLUCIÓN DE PROBLEMAS**
-
-### **Problema: Deploy falla**
+### Problema: Servicios no inician
 ```bash
 # Ver logs detallados
-railway logs --tail 1000
-
-# Verificar variables de entorno
-railway variables
+railway logs --tail 100
 
 # Reiniciar servicios
-railway service restart diabetes-api-production
+railway service restart api
+railway service restart mlflow
+railway service restart dashboard
 ```
 
-### **Problema: API no responde**
+### Problema: Puerto ocupado
 ```bash
-# Verificar health check
-curl https://diabetes-api-production.up.railway.app/health
-
-# Ver logs de la API
-railway logs --service diabetes-api-production
+# Ver puertos en uso
+railway exec lsof -i :8000
+railway exec lsof -i :5004
+railway exec lsof -i :8501
 ```
 
-### **Problema: Modelos no cargan**
+### Problema: Memoria insuficiente
 ```bash
-# Verificar que los modelos existen
-railway volume ls
+# Ver uso de memoria
+railway exec free -h
 
-# Ver logs de carga de modelos
-railway logs --service diabetes-api-production | grep -i "model"
+# Escalar recursos
+railway service scale api --cpu 2 --memory 2GB
 ```
 
-### **Problema: Base de datos no conecta**
+### Problema: Modelos no cargan
 ```bash
-# Verificar variables de DB
-railway variables | grep DATABASE
+# Verificar archivos de modelos
+railway exec ls -la mlruns/
 
-# Probar conexión
-railway run --environment production "python -c 'import psycopg2; print(\"DB OK\")'"
+# Verificar permisos
+railway exec chmod -R 755 mlruns/
 ```
 
----
+## 📈 Escalado
 
-## 📈 **ESCALABILIDAD**
-
-### **Configuración Actual:**
-- **Test:** 1 worker, recursos mínimos
-- **Production:** 4 workers, auto-scaling
-
-### **Para Mayor Tráfico:**
-1. **Aumentar workers:** `API_WORKERS=8`
-2. **Configurar auto-scaling** en Railway
-3. **Usar Redis** para cache
-4. **CDN** para archivos estáticos
-
----
-
-## 💰 **COSTOS ESTIMADOS**
-
-### **Railway Pricing:**
-- **Starter Plan:** $5/mes
-- **Hobby Plan:** $20/mes (recomendado)
-- **Pro Plan:** $50/mes (alta demanda)
-
-### **Recursos por Ambiente:**
-- **Test:** ~$5-10/mes
-- **Production:** ~$20-50/mes
-- **Base de datos:** ~$10-20/mes
-
----
-
-## 🔄 **MIGRACIÓN FUTURA A GCP**
-
-Cuando necesites más escalabilidad:
-
-1. **Exportar datos** de Railway
-2. **Configurar Cloud Run** con la misma imagen Docker
-3. **Migrar base de datos** a Cloud SQL
-4. **Configurar Load Balancer**
-5. **Actualizar DNS**
-
----
-
-## 📞 **SOPORTE**
-
-### **Comandos de Emergencia:**
+### Escalar Horizontalmente
 ```bash
-# Ver todos los servicios
-railway status
+# Escalar API service
+railway service scale api --replicas 3
 
-# Reiniciar todos los servicios
-railway up --reset
-
-# Ver logs de todos los servicios
-railway logs --all
-
-# Acceder al shell de un servicio
-railway run --environment production bash
+# Escalar Dashboard
+railway service scale dashboard --replicas 2
 ```
 
-### **Contacto:**
-- 📧 **Email:** soporte@tusistema.com
-- 📱 **Monitoreo:** Railway dashboard
-- 📊 **Métricas:** Railway analytics
+### Escalar Verticalmente
+```bash
+# Aumentar recursos de API
+railway service scale api --cpu 2 --memory 4GB
+
+# Aumentar recursos de MLflow
+railway service scale mlflow --cpu 1 --memory 2GB
+```
+
+## 🔄 Actualizaciones
+
+### Despliegue de Nuevas Versiones
+```bash
+# Hacer commit de cambios
+git add .
+git commit -m "Nueva versión del modelo"
+git push
+
+# Railway detectará cambios automáticamente y redeployará
+```
+
+### Rollback
+```bash
+# Ver historial de despliegues
+railway releases
+
+# Hacer rollback a versión anterior
+railway rollback <release-id>
+```
+
+## 🔒 Seguridad
+
+### Configuración de Firewall
+```bash
+# Configurar reglas de firewall en Railway Dashboard
+# Permitir solo puertos necesarios: 8000, 5004, 8501
+```
+
+### SSL/TLS
+```bash
+# Railway proporciona SSL automático
+# Todos los endpoints usan HTTPS por defecto
+```
+
+### Autenticación
+```bash
+# Configurar API keys
+railway variables set API_SECRET_KEY=your-secret-key
+
+# Configurar JWT
+railway variables set JWT_SECRET_KEY=your-jwt-secret
+```
+
+## 💾 Backup y Recuperación
+
+### Backup Automático
+```bash
+# Railway hace backups automáticos de la base de datos
+# Configurar en Railway Dashboard > Database > Backups
+```
+
+### Backup Manual
+```bash
+# Backup de modelos MLflow
+railway exec tar -czf mlruns_backup.tar.gz mlruns/
+
+# Descargar backup
+railway exec cat mlruns_backup.tar.gz | base64 -d > mlruns_backup.tar.gz
+```
+
+## 📞 Soporte
+
+### Contacto Railway
+- **Documentación**: [Railway Docs](https://docs.railway.app)
+- **Soporte**: [Railway Support](https://railway.app/support)
+- **Comunidad**: [Railway Discord](https://discord.gg/railway)
+
+### Logs de Error
+```bash
+# Capturar logs de error
+railway logs --level error > error_logs.txt
+
+# Enviar a soporte
+cat error_logs.txt | railway support
+```
+
+## 🎯 Próximos Pasos
+
+1. **Configurar dominio personalizado**
+   ```bash
+   railway domain add your-domain.com
+   ```
+
+2. **Configurar monitoreo avanzado**
+   ```bash
+   # Integrar con servicios de monitoreo externos
+   railway variables set MONITORING_URL=https://your-monitoring-service.com
+   ```
+
+3. **Configurar CI/CD**
+   ```bash
+   # Configurar GitHub Actions para despliegue automático
+   railway connect --github
+   ```
+
+4. **Configurar alertas**
+   ```bash
+   # Configurar notificaciones por email/Slack
+   railway alerts add --email your-email@domain.com
+   ```
 
 ---
 
-## ✅ **CHECKLIST DE DESPLIEGUE**
+**¡Feliz despliegue! 🚀**
 
-- [ ] ✅ Railway CLI instalado
-- [ ] ✅ Proyecto conectado a Railway
-- [ ] ✅ Ambientes test y production creados
-- [ ] ✅ Variables de entorno configuradas
-- [ ] ✅ Deploy a test exitoso
-- [ ] ✅ Health checks funcionando
-- [ ] ✅ Logs accesibles
-- [ ] ✅ URLs funcionando
-- [ ] ✅ Variables de producción configuradas
-- [ ] ✅ Deploy a producción exitoso
-- [ ] ✅ Monitoreo configurado
-- [ ] ✅ Documentación actualizada
-
----
-
-**🎉 ¡Tu Sistema Predictivo de Diabetes está listo para producción en Railway!**
-
-**Próximos pasos:**
-1. Ejecuta `./scripts/deploy_test.sh`
-2. Prueba el sistema en test
-3. Configura producción con `./scripts/deploy_production.sh`
-4. ¡Comienza a usar tu API!
-
----
-
-## 📚 **REFERENCIAS**
-
-- [Railway Documentation](https://docs.railway.app)
-- [Railway CLI Reference](https://docs.railway.app/develop/cli)
-- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
-- [Python Production Checklist](https://12factor.net/)
-
----
-
-**🚀 ¡Éxito con tu despliegue!**
+Para más información, consulta la [documentación oficial de Railway](https://docs.railway.app).

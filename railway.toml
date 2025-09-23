@@ -1,69 +1,31 @@
 [build]
-builder = "NIXPACKS"
+builder = "dockerfile"
 
 [deploy]
+startCommand = "./start_services.sh"
 healthcheckPath = "/health"
+healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
 
-# Variables de entorno globales
-[env]
-RAILWAY_ENVIRONMENT = "${{RAILWAY_ENVIRONMENT}}"
-RAILWAY_PROJECT_ID = "${{RAILWAY_PROJECT_ID}}"
-
-# ==================== SERVICIO API REST ====================
-[services.api]
-name = "diabetes-api-${{RAILWAY_ENVIRONMENT}}"
-internalPort = 8002
-processes = ["python api.py --host 0.0.0.0 --port 8002"]
+[[services]]
+name = "api"
+internalPort = 8000
+processes = 4
 healthcheckPath = "/health"
 
-[services.api.env]
-ENVIRONMENT = "${{RAILWAY_ENVIRONMENT}}"
-LOG_LEVEL = "INFO"
-API_HOST = "0.0.0.0"
-API_PORT = "8002"
+[[services]]
+name = "mlflow"
+internalPort = 5004
+processes = 1
+healthcheckPath = "/"
 
-# ==================== SERVICIO STREAMLIT ====================
-[services.streamlit]
-name = "diabetes-streamlit-${{RAILWAY_ENVIRONMENT}}"
+[[services]]
+name = "dashboard"
 internalPort = 8501
-processes = ["streamlit run web_app.py --server.port 8501 --server.address 0.0.0.0"]
+processes = 1
 healthcheckPath = "/"
 
-[services.streamlit.env]
-ENVIRONMENT = "${{RAILWAY_ENVIRONMENT}}"
-STREAMLIT_SERVER_ADDRESS = "0.0.0.0"
-STREAMLIT_SERVER_PORT = "8501"
-STREAMLIT_SERVER_HEADLESS = "true"
-
-# ==================== SERVICIO MLFLOW ====================
-[services.mlflow]
-name = "diabetes-mlflow-${{RAILWAY_ENVIRONMENT}}"
-internalPort = 5002
-processes = ["mlflow ui --backend-store-uri /app/outputs/mlruns --host 0.0.0.0 --port 5002"]
-healthcheckPath = "/"
-
-[services.mlflow.env]
-ENVIRONMENT = "${{RAILWAY_ENVIRONMENT}}"
-MLFLOW_TRACKING_URI = "file:///app/outputs/mlruns"
-
-# ==================== BASE DE DATOS ====================
-[databases.postgres]
-name = "diabetes-db-${{RAILWAY_ENVIRONMENT}}"
-
-[databases.postgres.env]
-DATABASE_URL = "${{RAILWAY_DATABASE_URL}}"
-
-# ==================== VOLUMEN PERSISTENTE ====================
-[volumes.models]
-name = "diabetes-models-${{RAILWAY_ENVIRONMENT}}"
-mountPath = "/app/models"
-
-[volumes.mlflow]
-name = "diabetes-mlflow-data-${{RAILWAY_ENVIRONMENT}}"
-mountPath = "/app/outputs/mlruns"
-
-[volumes.logs]
-name = "diabetes-logs-${{RAILWAY_ENVIRONMENT}}"
-mountPath = "/app/logs"
+[environments]
+production = { }
+staging = { }
