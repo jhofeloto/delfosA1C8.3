@@ -64,9 +64,9 @@ services:
     name: diabetes-mlflow
     runtime: python3
     buildCommand: pip install -r requirements.txt
-    startCommand: bash -c "mkdir -p outputs/mlruns && mlflow ui --backend-store-uri ./outputs/mlruns --host 0.0.0.0 --port $PORT"
+    startCommand: python scripts/start_mlflow.py
     healthCheckPath: /
-    healthCheckTimeout: 90
+    healthCheckTimeout: 120
     envVars:
       - key: ENVIRONMENT
         value: production
@@ -75,15 +75,17 @@ services:
       - key: LOG_LEVEL
         value: INFO
       - key: MLFLOW_TRACKING_URI
-        value: ./outputs/mlruns
+        value: /app/outputs/mlruns
       - key: MLFLOW_HOST
         value: 0.0.0.0
       - key: MLFLOW_PORT
-        value: 5002
+        value: 5000
       - key: MLFLOW_BACKEND_STORE_URI
-        value: ./outputs/mlruns
+        value: /app/outputs/mlruns
       - key: HOME
         value: /app
+      - key: PORT
+        value: 5000
 
   # Base de datos PostgreSQL
   - type: pserv
