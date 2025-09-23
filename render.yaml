@@ -28,7 +28,7 @@ services:
       - key: STREAMLIT_SERVER_HEADLESS
         value: true
       - key: MLFLOW_TRACKING_URI
-        value: file:///app/outputs/mlruns
+        value: ./outputs/mlruns
       - key: MLFLOW_HOST
         value: 0.0.0.0
       - key: MLFLOW_PORT
@@ -55,7 +55,7 @@ services:
       - key: STREAMLIT_SERVER_HEADLESS
         value: true
       - key: MLFLOW_TRACKING_URI
-        value: file:///app/outputs/mlruns
+        value: ./outputs/mlruns
       - key: API_BASE_URL
         value: https://delfosa1c8-3.onrender.com
 
@@ -64,9 +64,9 @@ services:
     name: diabetes-mlflow
     runtime: python3
     buildCommand: pip install -r requirements.txt
-    startCommand: bash -c "mkdir -p /app/outputs/mlruns && mlflow ui --backend-store-uri file:///app/outputs/mlruns --host 0.0.0.0 --port $PORT"
+    startCommand: bash -c "mkdir -p outputs/mlruns && mlflow ui --backend-store-uri ./outputs/mlruns --host 0.0.0.0 --port $PORT"
     healthCheckPath: /
-    healthCheckTimeout: 60
+    healthCheckTimeout: 90
     envVars:
       - key: ENVIRONMENT
         value: production
@@ -75,13 +75,13 @@ services:
       - key: LOG_LEVEL
         value: INFO
       - key: MLFLOW_TRACKING_URI
-        value: file:///app/outputs/mlruns
+        value: ./outputs/mlruns
       - key: MLFLOW_HOST
         value: 0.0.0.0
       - key: MLFLOW_PORT
         value: 5002
       - key: MLFLOW_BACKEND_STORE_URI
-        value: file:///app/outputs/mlruns
+        value: ./outputs/mlruns
       - key: HOME
         value: /app
 
